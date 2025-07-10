@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Ingresos de Autónomo y Empleado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff; /* White background for the card */
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Softer shadow */
+            padding: 2.5rem; /* More padding */
+            max-width: 600px; /* Wider container for more inputs */
+            width: 100%;
+            text-align: center;
+        }
+        input[type="number"] {
+            border: 2px solid #cbd5e1; /* Light gray border */
+            border-radius: 0.75rem; /* Rounded input fields */
+            padding: 0.75rem 1rem;
+            width: 100%;
+            font-size: 1.125rem; /* Larger font size */
+            color: #334155; /* Darker text for input */
+            transition: border-color 0.2s ease-in-out;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #6366f1; /* Indigo focus color */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* Soft focus ring */
+        }
+        button {
+            background-color: #6366f1; /* Indigo button */
+            color: #ffffff;
+            font-weight: 700; /* Bold text */
+            padding: 0.875rem 1.75rem;
+            border-radius: 0.75rem;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            cursor: pointer;
+            font-size: 1.125rem;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); /* Button shadow */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button:hover {
+            background-color: #4f46e5; /* Darker indigo on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+        button:active {
+            transform: translateY(0); /* Press down effect */
+        }
+        .result-box {
+            background-color: #e0f2fe; /* Light blue result background */
+            border: 1px solid #90cdf4; /* Blue border */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            font-size: 1.25rem; /* Larger result text */
+            color: #1e3a8a; /* Dark blue text */
+            font-weight: 600;
+        }
+        .info-text {
+            font-size: 0.95rem;
+            color: #64748b; /* Slate gray for info text */
+            margin-top: 1rem;
+            line-height: 1.5;
+            text-align: left; /* Align info text left */
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #475569; /* Slate 700 */
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+        .llm-response-box {
+            background-color: #f0f9ff; /* Very light blue */
+            border: 1px solid #bfdbfe; /* Light blue border */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            font-size: 1rem;
+            color: #1e40af; /* Darker blue text */
+            text-align: left;
+            white-space: pre-wrap; /* Preserve whitespace and line breaks */
+            word-wrap: break-word; /* Break long words */
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Calculadora de Ingresos (Autónomo vs. Empleado)</h1>
+
+        <div class="section-title">Datos Personales y Familiares</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+                <label for="age" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Tu edad:</label>
+                <input type="number" id="age" placeholder="Ej: 43" value="43" class="focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div>
+                <label for="childrenUnder18" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Hijos menores de 18:</label>
+                <input type="number" id="childrenUnder18" value="1" min="0" class="focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="md:col-span-2">
+                <label for="spouseIncome" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Ingresos anuales cónyuge (€):</label>
+                <input type="number" id="spouseIncome" placeholder="Ej: 17000" value="17000" class="focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+        </div>
+
+        <div class="section-title">Cálculo como Autónomo</div>
+        <div class="mb-6">
+            <label for="hourlyRate" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Tarifa por hora (€) como autónomo:</label>
+            <input type="number" id="hourlyRate" placeholder="Ej: 25" class="focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div class="section-title">Cálculo como Empleado</div>
+        <div class="mb-6">
+            <label for="employeeGrossSalary" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Sueldo bruto anual (€) como empleado:</label>
+            <input type="number" id="employeeGrossSalary" placeholder="Ej: 30000" value="30000" class="focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <button onclick="calculateIncome()" class="w-full">Calcular Ingresos</button>
+
+        <div id="result" class="result-box hidden text-left">
+            <p class="text-xl font-bold text-indigo-700 mb-2">Resultados como Autónomo:</p>
+            <p>Ingresos anuales (bruto, antes de IRPF): <span id="autonomoGrossAnnualIncomeResult" class="font-bold"></span></p>
+            <p>IRPF estimado: <span id="autonomoIrpfAmountResult" class="font-bold"></span></p>
+            <p>Ingresos anuales estimados (neto, después de IRPF): <span id="autonomoNetAnnualIncomeResult" class="font-bold"></span></p>
+            <p>Ingresos mensuales estimados (neto, después de IRPF): <span id="autonomoNetMonthlyIncomeResult" class="font-bold"></span></p>
+
+            <p class="text-xl font-bold text-indigo-700 mt-6 mb-2">Resultados como Empleado:</p>
+            <p>Sueldo bruto anual: <span id="employeeGrossAnnualIncomeResult" class="font-bold"></span></p>
+            <p>Deducción Seguridad Social (estimada): <span id="employeeSSAmountResult" class="font-bold"></span></p>
+            <p>IRPF estimado: <span id="employeeIrpfAmountResult" class="font-bold"></span></p>
+            <p>Sueldo anual estimado (neto, después de IRPF y SS): <span id="employeeNetAnnualIncomeResult" class="font-bold"></span></p>
+            <p>Sueldo mensual estimado (neto, después de IRPF y SS): <span id="employeeNetMonthlyIncomeResult" class="font-bold"></span></p>
+        </div>
+
+        <button onclick="suggestDeductions()" class="w-full mt-6">✨ Sugerencias de Deducciones para Autónomos ✨</button>
+        <div id="deductionsSuggestion" class="llm-response-box hidden">
+            <div id="loadingSpinner" class="hidden loading-spinner mx-auto"></div>
+            <p id="deductionText"></p>
+        </div>
+
+        <div class="info-text">
+            <p><strong>Consideraciones y Asunciones para el Cálculo:</strong></p>
+            <ul class="list-disc list-inside mt-2 space-y-1">
+                <li><strong>Horas de trabajo anuales (Autónomo):</strong> 1760 horas (aprox. 8h/día, 5 días/semana, 44 semanas/año).</li>
+                <li><strong>Cuota de autónomo:</strong> 315 €/mes (valor de referencia para 2024, sin bonificaciones).</li>
+                <li><strong>Deducción Seguridad Social (Empleado):</strong> Estimada en un 6.35% del sueldo bruto anual.</li>
+                <li><strong>No se descuenta el IVA</strong> (se considera aparte de tu tarifa como autónomo).</li>
+                <li>El cálculo del <strong>IRPF es una estimación simplificada</strong> basada en las siguientes asunciones para 2024 (tramos estatales y mínimos):
+                    <ul class="list-circle list-inside ml-4 mt-1">
+                        <li><strong>Mínimo Personal:</strong> 5.550 €</li>
+                        <li><strong>Mínimo por Descendientes (1º hijo):</strong> 2.400 €</li>
+                        <li><strong>Tramos IRPF (aproximados):</strong>
+                            <ul class="list-square list-inside ml-4">
+                                <li>Hasta 12.450 €: 19%</li>
+                                <li>De 12.450 € a 20.200 €: 24%</li>
+                                <li>De 20.200 € a 35.200 €: 30%</li>
+                                <li>De 35.200 € a 60.000 €: 37%</li>
+                                <li>De 60.000 € a 300.000 €: 45%</li>
+                                <li>Más de 300.000 €: 47%</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>Se asume <strong>tributación individual</strong>. Los ingresos del cónyuge se consideran para el contexto familiar, pero no se realiza una simulación de declaración conjunta compleja.</li>
+                <li>Para el cálculo como autónomo, **no se consideran otros gastos deducibles de la actividad** más allá de la cuota de autónomos.</li>
+                <li>Este es un cálculo estimado y <strong>no sustituye el asesoramiento fiscal personalizado</strong>.</li>
+                <li>**Nueva función de IA:** Puedes usar el botón "Sugerencias de Deducciones" para obtener ideas generales sobre gastos deducibles.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Define constants for calculation
+        const HOURS_PER_YEAR = 1760; // 8 hours/day * 5 days/week * 44 weeks/year
+        const AUTONOMO_FEE_MONTHLY = 315; // Approximate regular monthly fee for 2024 without aid
+        const EMPLOYEE_SS_RATE = 0.0635; // Approximate employee Social Security contribution rate (e.g., 4.70% CC + 1.55% Desempleo + 0.10% FP)
+
+        /**
+         * Calculates the IRPF based on a simplified progressive tax system.
+         * @param {number} taxableIncome - The income subject to IRPF after deductions.
+         * @returns {number} The estimated IRPF amount.
+         */
+        function calculateIRPF(taxableIncome) {
+            // Simplified IRPF tax brackets (State general rates, approximate for 2024)
+            const taxBrackets = [
+                { limit: 12450, rate: 0.19 },
+                { limit: 20200, rate: 0.24 },
+                { limit: 35200, rate: 0.30 },
+                { limit: 60000, rate: 0.37 },
+                { limit: 300000, rate: 0.45 },
+                { limit: Infinity, rate: 0.47 } // Last bracket
+            ];
+
+            let irpf = 0;
+            let remainingIncome = taxableIncome;
+            let previousLimit = 0;
+
+            for (let i = 0; i < taxBrackets.length; i++) {
+                const bracket = taxBrackets[i];
+                const bracketIncome = Math.min(remainingIncome, bracket.limit - previousLimit);
+
+                if (bracketIncome > 0) {
+                    irpf += bracketIncome * bracket.rate;
+                    remainingIncome -= bracketIncome;
+                }
+                previousLimit = bracket.limit;
+
+                if (remainingIncome <= 0) {
+                    break;
+                }
+            }
+            return irpf;
+        }
+
+        /**
+         * Calculates personal and family minimums for IRPF based on age and number of children.
+         * @param {number} age - The age of the individual.
+         * @param {number} childrenUnder18 - Number of children under 18.
+         * @returns {number} The total personal and family minimum.
+         */
+        function getPersonalAndFamilyMinimum(age, childrenUnder18) {
+            let minimum = 5550; // Mínimo personal general
+
+            if (age > 65) {
+                minimum += 1150; // Mínimo por edad (over 65)
+            }
+            if (age > 75) {
+                minimum += 1400; // Additional for over 75
+            }
+
+            // Mínimo por descendientes (simplified)
+            if (childrenUnder18 === 1) {
+                minimum += 2400; // For the first child
+            } else if (childrenUnder18 === 2) {
+                minimum += 2400 + 2700; // For two children
+            } else if (childrenUnder18 > 2) {
+                minimum += 2400 + 2700 + (childrenUnder18 - 2) * 4000; // Simplified for more children
+            }
+            return minimum;
+        }
+
+        /**
+         * Calculates the estimated annual and monthly income for a freelancer in Spain,
+         * and also for an employed individual, including simplified IRPF and SS calculations.
+         */
+        function calculateIncome() {
+            // Get input values
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
+            const age = parseInt(document.getElementById('age').value);
+            const childrenUnder18 = parseInt(document.getElementById('childrenUnder18').value);
+            const spouseIncome = parseFloat(document.getElementById('spouseIncome').value);
+            const employeeGrossSalary = parseFloat(document.getElementById('employeeGrossSalary').value);
+
+            // Get result display elements
+            const resultDiv = document.getElementById('result');
+            const autonomoGrossAnnualIncomeResultSpan = document.getElementById('autonomoGrossAnnualIncomeResult');
+            const autonomoIrpfAmountResultSpan = document.getElementById('autonomoIrpfAmountResult');
+            const autonomoNetAnnualIncomeResultSpan = document.getElementById('autonomoNetAnnualIncomeResult');
+            const autonomoNetMonthlyIncomeResultSpan = document.getElementById('autonomoNetMonthlyIncomeResult');
+
+            const employeeGrossAnnualIncomeResultSpan = document.getElementById('employeeGrossAnnualIncomeResult');
+            const employeeSSAmountResultSpan = document.getElementById('employeeSSAmountResult');
+            const employeeIrpfAmountResultSpan = document.getElementById('employeeIrpfAmountResult');
+            const employeeNetAnnualIncomeResultSpan = document.getElementById('employeeNetAnnualIncomeResult');
+            const employeeNetMonthlyIncomeResultSpan = document.getElementById('employeeNetMonthlyIncomeResult');
+
+            // Validate inputs
+            if (isNaN(hourlyRate) || hourlyRate <= 0 || isNaN(age) || age <= 0 || isNaN(childrenUnder18) || childrenUnder18 < 0 || isNaN(spouseIncome) || spouseIncome < 0 || isNaN(employeeGrossSalary) || employeeGrossSalary <= 0) {
+                autonomoGrossAnnualIncomeResultSpan.textContent = "Por favor, introduce valores válidos en todos los campos.";
+                autonomoIrpfAmountResultSpan.textContent = "";
+                autonomoNetAnnualIncomeResultSpan.textContent = "";
+                autonomoNetMonthlyIncomeResultSpan.textContent = "";
+                employeeGrossAnnualIncomeResultSpan.textContent = "";
+                employeeSSAmountResultSpan.textContent = "";
+                employeeIrpfAmountResultSpan.textContent = "";
+                employeeNetAnnualIncomeResultSpan.textContent = "";
+                employeeNetMonthlyIncomeResultSpan.textContent = "";
+
+                resultDiv.classList.remove('hidden');
+                resultDiv.classList.add('bg-red-100', 'border-red-400', 'text-red-700'); // Error styling
+                resultDiv.classList.remove('bg-blue-100', 'border-blue-400', 'text-blue-700'); // Remove success styling
+                return;
+            }
+
+            // --- Calculation for Autónomo ---
+            const autonomoGrossAnnualIncome = hourlyRate * HOURS_PER_YEAR;
+            const autonomoFeeAnnual = AUTONOMO_FEE_MONTHLY * 12;
+            // autonomoIncomeBeforeIRPF represents the net income after the autonomo fee, before IRPF and any other personal deductions
+            const autonomoIncomeBeforeIRPF = autonomoGrossAnnualIncome - autonomoFeeAnnual;
+
+            const autonomoPersonalAndFamilyMinimum = getPersonalAndFamilyMinimum(age, childrenUnder18);
+            // autonomoTaxableBase is the income subject to IRPF after deducting the autonomo fee and personal/family minimums.
+            // This calculation assumes no other business expenses are deducted.
+            const autonomoTaxableBase = Math.max(0, autonomoIncomeBeforeIRPF - autonomoPersonalAndFamilyMinimum);
+            const autonomoIrpfAmount = calculateIRPF(autonomoTaxableBase);
+
+            const autonomoNetAnnualIncomeAfterIRPF = autonomoIncomeBeforeIRPF - autonomoIrpfAmount;
+            const autonomoNetMonthlyIncomeAfterIRPF = autonomoNetAnnualIncomeAfterIRPF / 12;
+
+            // Display Autónomo results
+            autonomoGrossAnnualIncomeResultSpan.textContent = `${autonomoGrossAnnualIncome.toFixed(2)} €`;
+            autonomoIrpfAmountResultSpan.textContent = `${autonomoIrpfAmount.toFixed(2)} €`;
+            autonomoNetAnnualIncomeResultSpan.textContent = `${autonomoNetAnnualIncomeAfterIRPF.toFixed(2)} €`;
+            autonomoNetMonthlyIncomeResultSpan.textContent = `${autonomoNetMonthlyIncomeAfterIRPF.toFixed(2)} €`;
+
+
+            // --- Calculation for Empleado ---
+            const employeeSSAmount = employeeGrossSalary * EMPLOYEE_SS_RATE;
+            const employeeIncomeBeforeIRPF = employeeGrossSalary - employeeSSAmount;
+
+            const employeePersonalAndFamilyMinimum = getPersonalAndFamilyMinimum(age, childrenUnder18);
+            const employeeTaxableBase = Math.max(0, employeeIncomeBeforeIRPF - employeePersonalAndFamilyMinimum);
+            const employeeIrpfAmount = calculateIRPF(employeeTaxableBase);
+
+            const employeeNetAnnualIncomeAfterIRPF_SS = employeeIncomeBeforeIRPF - employeeIrpfAmount;
+            const employeeNetMonthlyIncomeAfterIRPF_SS = employeeNetAnnualIncomeAfterIRPF_SS / 12;
+
+            // Display Empleado results
+            employeeGrossAnnualIncomeResultSpan.textContent = `${employeeGrossSalary.toFixed(2)} €`;
+            employeeSSAmountResultSpan.textContent = `${employeeSSAmount.toFixed(2)} €`;
+            employeeIrpfAmountResultSpan.textContent = `${employeeIrpfAmount.toFixed(2)} €`;
+            employeeNetAnnualIncomeResultSpan.textContent = `${employeeNetAnnualIncomeAfterIRPF_SS.toFixed(2)} €`;
+            employeeNetMonthlyIncomeResultSpan.textContent = `${employeeNetMonthlyIncomeAfterIRPF_SS.toFixed(2)} €`;
+
+
+            resultDiv.classList.remove('hidden');
+            resultDiv.classList.remove('bg-red-100', 'border-red-400', 'text-red-700'); // Remove error styling
+            resultDiv.classList.add('bg-blue-100', 'border-blue-400', 'text-blue-700'); // Add success styling
+        }
+
+        /**
+         * Uses the Gemini API to suggest common tax deductions for freelancers in Spain.
+         */
+        async function suggestDeductions() {
+            const deductionsSuggestionDiv = document.getElementById('deductionsSuggestion');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const deductionText = document.getElementById('deductionText');
+
+            deductionsSuggestionDiv.classList.remove('hidden');
+            loadingSpinner.classList.remove('hidden');
+            deductionText.textContent = ''; // Clear previous text
+
+            const prompt = "Genera una lista de 10-15 gastos comunes y deducibles para un autónomo en España para el IRPF, con una breve descripción de cada uno. Formatea la respuesta como una lista numerada.";
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Leave this as-is. Canvas will provide the API key at runtime.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    deductionText.textContent = text;
+                } else {
+                    deductionText.textContent = "No se pudieron generar sugerencias de deducciones. Inténtalo de nuevo más tarde.";
+                }
+            } catch (error) {
+                console.error("Error al llamar a la API de Gemini:", error);
+                deductionText.textContent = "Error al conectar con el servicio de IA. Por favor, inténtalo de nuevo.";
+            } finally {
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
