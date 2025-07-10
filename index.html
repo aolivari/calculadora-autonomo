@@ -111,9 +111,15 @@
         </div>
 
         <div class="section-title">Cálculo como Autónomo</div>
-        <div class="mb-6">
-            <label for="hourlyRate" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Tarifa por hora (€) como autónomo:</label>
-            <input type="number" id="hourlyRate" class="focus:ring-indigo-500 focus:border-indigo-500">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+                <label for="hourlyRate" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Tarifa por hora (€) como autónomo:</label>
+                <input type="number" id="hourlyRate" class="focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div>
+                <label for="annualHours" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Horas anuales trabajadas:</label>
+                <input type="number" id="annualHours" min="0" class="focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
         </div>
 
         <div class="section-title">Gastos Deducibles (Autónomo)</div>
@@ -182,7 +188,7 @@
         <div class="info-text">
             <p><strong>Consideraciones y Asunciones para el Cálculo:</strong></p>
             <ul class="list-disc list-inside mt-2 space-y-1">
-                <li><strong>Horas de trabajo anuales (Autónomo):</strong> 1760 horas (aprox. 8h/día, 5 días/semana, 44 semanas/año).</li>
+                <li><strong>Horas de trabajo anuales (Autónomo):</strong> Ahora puedes especificar las horas anuales trabajadas. El valor por defecto es 1760 horas (aprox. 8h/día, 5 días/semana, 44 semanas/año).</li>
                 <li><strong>Cuota de autónomo:</strong> 315 €/mes (valor de referencia para 2024, sin bonificaciones).</li>
                 <li><strong>Deducción Seguridad Social (Empleado):</strong> Estimada en un 6.35% del sueldo bruto anual.</li>
                 <li><strong>No se descuenta el IVA</strong> (se considera aparte de tu tarifa como autónomo).</li>
@@ -215,8 +221,7 @@
     </div>
 
     <script>
-        // Define constants for calculation
-        const HOURS_PER_YEAR = 1760; // 8 hours/day * 5 days/week * 44 weeks/year
+        // Define constants for calculation (HOURS_PER_YEAR is now dynamic)
         const AUTONOMO_FEE_MONTHLY = 315; // Approximate regular monthly fee for 2024 without aid
         const EMPLOYEE_SS_RATE = 0.0635; // Approximate employee Social Security contribution rate (e.g., 4.70% CC + 1.55% Desempleo + 0.10% FP)
         const HOME_OFFICE_UTILITY_DEDUCTION_RATE = 0.30; // 30% deduction for utilities if working from home
@@ -241,6 +246,7 @@
             document.getElementById('childrenUnder18').placeholder = `Ej: ${getRandomInt(0, 3)}`;
             document.getElementById('spouseIncome').placeholder = `Ej: ${getRandomInt(15000, 25000)}`;
             document.getElementById('hourlyRate').placeholder = `Ej: ${getRandomInt(15, 40)}`;
+            document.getElementById('annualHours').placeholder = `Ej: ${getRandomInt(1600, 2000)}`; // New placeholder for annual hours
             document.getElementById('housingAmount').placeholder = `Ej: ${getRandomInt(8000, 15000)}`;
             document.getElementById('officePercentage').placeholder = `Ej: ${getRandomInt(10, 50)}`;
             document.getElementById('electricityBill').placeholder = `Ej: ${getRandomInt(30, 80)}`;
@@ -321,6 +327,7 @@
         function calculateIncome() {
             // Get input values
             const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
+            const annualHours = parseFloat(document.getElementById('annualHours').value); // Get annual hours
             const age = parseInt(document.getElementById('age').value);
             const childrenUnder18 = parseInt(document.getElementById('childrenUnder18').value);
             const spouseIncome = parseFloat(document.getElementById('spouseIncome').value);
@@ -353,7 +360,7 @@
             const employeeNetMonthlyIncomeResultSpan = document.getElementById('employeeNetMonthlyIncomeResult');
 
             // Validate inputs
-            if (isNaN(hourlyRate) || hourlyRate <= 0 || isNaN(age) || age <= 0 || isNaN(childrenUnder18) || childrenUnder18 < 0 || isNaN(spouseIncome) || spouseIncome < 0 || isNaN(employeeGrossSalary) || employeeGrossSalary <= 0) {
+            if (isNaN(hourlyRate) || hourlyRate <= 0 || isNaN(annualHours) || annualHours <= 0 || isNaN(age) || age <= 0 || isNaN(childrenUnder18) || childrenUnder18 < 0 || isNaN(spouseIncome) || spouseIncome < 0 || isNaN(employeeGrossSalary) || employeeGrossSalary <= 0) {
                 autonomoGrossAnnualIncomeResultSpan.textContent = "Por favor, introduce valores válidos en todos los campos.";
                 autonomoIrpfAmountResultSpan.textContent = "";
                 autonomoNetAnnualIncomeResultSpan.textContent = "";
@@ -373,7 +380,7 @@
             }
 
             // --- Calculation for Autónomo ---
-            const initialAutonomoGrossAnnualIncome = hourlyRate * HOURS_PER_YEAR;
+            const initialAutonomoGrossAnnualIncome = hourlyRate * annualHours; // Use dynamic annualHours
             const autonomoFeeAnnual = AUTONOMO_FEE_MONTHLY * 12;
 
             // Calculate business expenses (housing and utilities)
