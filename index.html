@@ -98,28 +98,64 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
                 <label for="age" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Tu edad:</label>
-                <input type="number" id="age" placeholder="Ej: 43" class="focus:ring-indigo-500 focus:border-indigo-500">
+                <input type="number" id="age" class="focus:ring-indigo-500 focus:border-indigo-500">
             </div>
             <div>
                 <label for="childrenUnder18" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Hijos menores de 18:</label>
-                <input type="number" id="childrenUnder18" value="1" min="0" class="focus:ring-indigo-500 focus:border-indigo-500">
+                <input type="number" id="childrenUnder18" min="0" class="focus:ring-indigo-500 focus:border-indigo-500">
             </div>
             <div class="md:col-span-2">
                 <label for="spouseIncome" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Ingresos anuales cónyuge (€):</label>
-                <input type="number" id="spouseIncome" placeholder="Ej: 17000" class="focus:ring-indigo-500 focus:border-indigo-500">
+                <input type="number" id="spouseIncome" class="focus:ring-indigo-500 focus:border-indigo-500">
             </div>
         </div>
 
         <div class="section-title">Cálculo como Autónomo</div>
         <div class="mb-6">
             <label for="hourlyRate" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Tarifa por hora (€) como autónomo:</label>
-            <input type="number" id="hourlyRate" placeholder="Ej: 25" class="focus:ring-indigo-500 focus:border-indigo-500">
+            <input type="number" id="hourlyRate" class="focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div class="section-title">Gastos Deducibles (Autónomo)</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+                <label for="housingExpenseType" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Tipo de gasto de vivienda:</label>
+                <select id="housingExpenseType" class="border-2 border-cbd5e1 rounded-xl p-3 w-full text-lg text-gray-700 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="none">Ninguno</option>
+                    <option value="rent">Alquiler</option>
+                    <option value="mortgage">Hipoteca</option>
+                </select>
+            </div>
+            <div>
+                <label for="housingAmount" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Gasto anual de vivienda (€):</label>
+                <input type="number" id="housingAmount" class="focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="md:col-span-2">
+                <label for="officePercentage" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Porcentaje de vivienda afecto a actividad (%):</label>
+                <input type="number" id="officePercentage" min="0" max="100" class="focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div>
+                <label for="electricityBill" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Factura mensual luz (€):</label>
+                <input type="number" id="electricityBill" class="focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div>
+                <label for="waterBill" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Factura mensual agua (€):</label>
+                <input type="number" id="waterBill" class="focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div>
+                <label for="gasBill" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Factura mensual gas (€):</label>
+                <input type="number" id="gasBill" class="focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div>
+                <label for="internetBill" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Factura mensual internet (€):</label>
+                <input type="number" id="internetBill" class="focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
         </div>
 
         <div class="section-title">Cálculo como Empleado</div>
         <div class="mb-6">
             <label for="employeeGrossSalary" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Sueldo bruto anual (€) como empleado:</label>
-            <input type="number" id="employeeGrossSalary" placeholder="Ej: 30000" class="focus:ring-indigo-500 focus:border-indigo-500">
+            <input type="number" id="employeeGrossSalary" class="focus:ring-indigo-500 focus:border-indigo-500">
         </div>
 
         <button onclick="calculateIncome()" class="w-full">Calcular Ingresos</button>
@@ -130,6 +166,10 @@
             <p>IRPF estimado: <span id="autonomoIrpfAmountResult" class="font-bold"></span></p>
             <p>Ingresos anuales estimados (neto, después de IRPF): <span id="autonomoNetAnnualIncomeResult" class="font-bold"></span></p>
             <p>Ingresos mensuales estimados (neto, después de IRPF): <span id="autonomoNetMonthlyIncomeResult" class="font-bold"></span></p>
+            <p class="text-lg font-bold text-green-700 mt-4">Ahorro IRPF por deducciones de vivienda/suministros:</p>
+            <p>Ahorro anual estimado: <span id="irpfSavedAnnualResult" class="font-bold text-green-700"></span></p>
+            <p>Ahorro mensual estimado: <span id="irpfSavedMonthlyResult" class="font-bold text-green-700"></span></p>
+
 
             <p class="text-xl font-bold text-indigo-700 mt-6 mb-2">Resultados como Empleado:</p>
             <p>Sueldo bruto anual: <span id="employeeGrossAnnualIncomeResult" class="font-bold"></span></p>
@@ -163,7 +203,12 @@
                     </ul>
                 </li>
                 <li>Se asume <strong>tributación individual</strong>. Los ingresos del cónyuge se consideran para el contexto familiar, pero no se realiza una simulación de declaración conjunta compleja.</li>
-                <li>Para el cálculo como autónomo, **no se consideran otros gastos deducibles de la actividad** más allá de la cuota de autónomos.</li>
+                <li>Para el cálculo como autónomo, la deducción de gastos de vivienda y suministros se aplica de la siguiente manera (asumiendo que la vivienda es el lugar de trabajo):
+                    <ul class="list-circle list-inside ml-4 mt-1">
+                        <li><strong>Gasto de vivienda (alquiler/hipoteca):</strong> Se deduce la parte proporcional del gasto anual según el "Porcentaje de vivienda afecto a actividad".</li>
+                        <li><strong>Suministros (luz, agua, gas, internet):</strong> Se deduce el 30% de la parte proporcional de las facturas mensuales (multiplicadas por 12) según el "Porcentaje de vivienda afecto a actividad".</li>
+                    </ul>
+                </li>
                 <li>Este es un cálculo estimado y <strong>no sustituye el asesoramiento fiscal personalizado</strong>.</li>
             </ul>
         </div>
@@ -174,6 +219,36 @@
         const HOURS_PER_YEAR = 1760; // 8 hours/day * 5 days/week * 44 weeks/year
         const AUTONOMO_FEE_MONTHLY = 315; // Approximate regular monthly fee for 2024 without aid
         const EMPLOYEE_SS_RATE = 0.0635; // Approximate employee Social Security contribution rate (e.g., 4.70% CC + 1.55% Desempleo + 0.10% FP)
+        const HOME_OFFICE_UTILITY_DEDUCTION_RATE = 0.30; // 30% deduction for utilities if working from home
+
+        /**
+         * Helper function to generate a random integer within a range.
+         * @param {number} min - The minimum value (inclusive).
+         * @param {number} max - The maximum value (inclusive).
+         * @returns {number} A random integer.
+         */
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        /**
+         * Sets random placeholder values for input fields on page load.
+         */
+        function setRandomPlaceholders() {
+            document.getElementById('age').placeholder = `Ej: ${getRandomInt(25, 55)}`;
+            document.getElementById('childrenUnder18').placeholder = `Ej: ${getRandomInt(0, 3)}`;
+            document.getElementById('spouseIncome').placeholder = `Ej: ${getRandomInt(15000, 25000)}`;
+            document.getElementById('hourlyRate').placeholder = `Ej: ${getRandomInt(15, 40)}`;
+            document.getElementById('housingAmount').placeholder = `Ej: ${getRandomInt(8000, 15000)}`;
+            document.getElementById('officePercentage').placeholder = `Ej: ${getRandomInt(10, 50)}`;
+            document.getElementById('electricityBill').placeholder = `Ej: ${getRandomInt(30, 80)}`;
+            document.getElementById('waterBill').placeholder = `Ej: ${getRandomInt(15, 35)}`;
+            document.getElementById('gasBill').placeholder = `Ej: ${getRandomInt(20, 60)}`;
+            document.getElementById('internetBill').placeholder = `Ej: ${getRandomInt(30, 50)}`;
+            document.getElementById('employeeGrossSalary').placeholder = `Ej: ${getRandomInt(25000, 40000)}`;
+        }
 
         /**
          * Calculates the IRPF based on a simplified progressive tax system.
@@ -251,12 +326,25 @@
             const spouseIncome = parseFloat(document.getElementById('spouseIncome').value);
             const employeeGrossSalary = parseFloat(document.getElementById('employeeGrossSalary').value);
 
+            // New inputs for deductions
+            const housingExpenseType = document.getElementById('housingExpenseType').value;
+            const housingAmount = parseFloat(document.getElementById('housingAmount').value);
+            const officePercentage = parseFloat(document.getElementById('officePercentage').value);
+            const electricityBill = parseFloat(document.getElementById('electricityBill').value);
+            const waterBill = parseFloat(document.getElementById('waterBill').value);
+            const gasBill = parseFloat(document.getElementById('gasBill').value);
+            const internetBill = parseFloat(document.getElementById('internetBill').value);
+
+
             // Get result display elements
             const resultDiv = document.getElementById('result');
             const autonomoGrossAnnualIncomeResultSpan = document.getElementById('autonomoGrossAnnualIncomeResult');
             const autonomoIrpfAmountResultSpan = document.getElementById('autonomoIrpfAmountResult');
             const autonomoNetAnnualIncomeResultSpan = document.getElementById('autonomoNetAnnualIncomeResult');
             const autonomoNetMonthlyIncomeResultSpan = document.getElementById('autonomoNetMonthlyIncomeResult');
+            const irpfSavedAnnualResultSpan = document.getElementById('irpfSavedAnnualResult'); // New span for IRPF saved
+            const irpfSavedMonthlyResultSpan = document.getElementById('irpfSavedMonthlyResult'); // New span for IRPF saved monthly
+
 
             const employeeGrossAnnualIncomeResultSpan = document.getElementById('employeeGrossAnnualIncomeResult');
             const employeeSSAmountResultSpan = document.getElementById('employeeSSAmountResult');
@@ -270,6 +358,8 @@
                 autonomoIrpfAmountResultSpan.textContent = "";
                 autonomoNetAnnualIncomeResultSpan.textContent = "";
                 autonomoNetMonthlyIncomeResultSpan.textContent = "";
+                irpfSavedAnnualResultSpan.textContent = ""; // Clear
+                irpfSavedMonthlyResultSpan.textContent = ""; // Clear
                 employeeGrossAnnualIncomeResultSpan.textContent = "";
                 employeeSSAmountResultSpan.textContent = "";
                 employeeIrpfAmountResultSpan.textContent = "";
@@ -283,25 +373,64 @@
             }
 
             // --- Calculation for Autónomo ---
-            const autonomoGrossAnnualIncome = hourlyRate * HOURS_PER_YEAR;
+            const initialAutonomoGrossAnnualIncome = hourlyRate * HOURS_PER_YEAR;
             const autonomoFeeAnnual = AUTONOMO_FEE_MONTHLY * 12;
-            // autonomoIncomeBeforeIRPF represents the net income after the autonomo fee, before IRPF and any other personal deductions
-            const autonomoIncomeBeforeIRPF = autonomoGrossAnnualIncome - autonomoFeeAnnual;
 
+            // Calculate business expenses (housing and utilities)
+            let totalDeductibleBusinessExpenses = autonomoFeeAnnual; // Start with autonomo fee
+
+            let deductibleHousing = 0;
+            if (housingExpenseType !== "none" && !isNaN(housingAmount) && housingAmount > 0 && !isNaN(officePercentage) && officePercentage >= 0 && officePercentage <= 100) {
+                deductibleHousing = housingAmount * (officePercentage / 100);
+                totalDeductibleBusinessExpenses += deductibleHousing;
+            }
+
+            let deductibleUtilities = 0;
+            if (!isNaN(officePercentage) && officePercentage >= 0 && officePercentage <= 100) {
+                const annualOfficePercentage = officePercentage / 100;
+
+                if (!isNaN(electricityBill) && electricityBill > 0) {
+                    deductibleUtilities += (electricityBill * 12 * annualOfficePercentage * HOME_OFFICE_UTILITY_DEDUCTION_RATE);
+                }
+                if (!isNaN(waterBill) && waterBill > 0) {
+                    deductibleUtilities += (waterBill * 12 * annualOfficePercentage * HOME_OFFICE_UTILITY_DEDUCTION_RATE);
+                }
+                if (!isNaN(gasBill) && gasBill > 0) {
+                    deductibleUtilities += (gasBill * 12 * annualOfficePercentage * HOME_OFFICE_UTILITY_DEDUCTION_RATE);
+                }
+                if (!isNaN(internetBill) && internetBill > 0) {
+                    deductibleUtilities += (internetBill * 12 * annualOfficePercentage * HOME_OFFICE_UTILITY_DEDUCTION_RATE);
+                }
+                totalDeductibleBusinessExpenses += deductibleUtilities;
+            }
+
+            // Calculate IRPF WITHOUT the new housing/utility deductions to find the "saving"
+            const autonomoIncomeBeforeIRPF_NoExtraDeductions = initialAutonomoGrossAnnualIncome - autonomoFeeAnnual;
             const autonomoPersonalAndFamilyMinimum = getPersonalAndFamilyMinimum(age, childrenUnder18);
-            // autonomoTaxableBase is the income subject to IRPF after deducting the autonomo fee and personal/family minimums.
-            // This calculation assumes no other business expenses are deducted.
-            const autonomoTaxableBase = Math.max(0, autonomoIncomeBeforeIRPF - autonomoPersonalAndFamilyMinimum);
-            const autonomoIrpfAmount = calculateIRPF(autonomoTaxableBase);
+            const autonomoTaxableBase_NoExtraDeductions = Math.max(0, autonomoIncomeBeforeIRPF_NoExtraDeductions - autonomoPersonalAndFamilyMinimum);
+            const irpfWithoutExtraDeductions = calculateIRPF(autonomoTaxableBase_NoExtraDeductions);
 
-            const autonomoNetAnnualIncomeAfterIRPF = autonomoIncomeBeforeIRPF - autonomoIrpfAmount;
+
+            // Calculate IRPF WITH all deductions (autonomo fee + housing + utilities)
+            const autonomoIncomeBeforeIRPF_WithAllDeductions = initialAutonomoGrossAnnualIncome - totalDeductibleBusinessExpenses;
+            const autonomoTaxableBase_WithAllDeductions = Math.max(0, autonomoIncomeBeforeIRPF_WithAllDeductions - autonomoPersonalAndFamilyMinimum);
+            const autonomoIrpfAmount = calculateIRPF(autonomoTaxableBase_WithAllDeductions);
+
+            // Calculate the IRPF saving due to housing/utility deductions
+            const irpfSavedAnnual = irpfWithoutExtraDeductions - autonomoIrpfAmount;
+            const irpfSavedMonthly = irpfSavedAnnual / 12;
+
+
+            const autonomoNetAnnualIncomeAfterIRPF = autonomoIncomeBeforeIRPF_WithAllDeductions - autonomoIrpfAmount;
             const autonomoNetMonthlyIncomeAfterIRPF = autonomoNetAnnualIncomeAfterIRPF / 12;
 
             // Display Autónomo results
-            autonomoGrossAnnualIncomeResultSpan.textContent = `${autonomoGrossAnnualIncome.toFixed(2)} €`;
+            autonomoGrossAnnualIncomeResultSpan.textContent = `${initialAutonomoGrossAnnualIncome.toFixed(2)} €`; // Display original gross income
             autonomoIrpfAmountResultSpan.textContent = `${autonomoIrpfAmount.toFixed(2)} €`;
             autonomoNetAnnualIncomeResultSpan.textContent = `${autonomoNetAnnualIncomeAfterIRPF.toFixed(2)} €`;
             autonomoNetMonthlyIncomeResultSpan.textContent = `${autonomoNetMonthlyIncomeAfterIRPF.toFixed(2)} €`;
+            irpfSavedAnnualResultSpan.textContent = `${irpfSavedAnnual.toFixed(2)} €`;
+            irpfSavedMonthlyResultSpan.textContent = `${irpfSavedMonthly.toFixed(2)} €`;
 
 
             // --- Calculation for Empleado ---
@@ -324,9 +453,12 @@
 
 
             resultDiv.classList.remove('hidden');
-            resultDiv.classList.remove('bg-red-100', 'border-red-400', 'text-red-700'); // Error styling
+            resultDiv.classList.remove('bg-red-100', 'border-red-400', 'text-red-700'); // Remove error styling
             resultDiv.classList.add('bg-blue-100', 'border-blue-400', 'text-blue-700'); // Add success styling
         }
+
+        // Call setRandomPlaceholders when the window loads
+        window.onload = setRandomPlaceholders;
     </script>
 </body>
 </html>
