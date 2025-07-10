@@ -48,7 +48,7 @@
             transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
             cursor: pointer;
             font-size: 1.125rem;
-            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); /* Button shadow */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Button shadow */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -88,30 +88,6 @@
             border-bottom: 2px solid #e2e8f0;
             padding-bottom: 0.5rem;
         }
-        .llm-response-box {
-            background-color: #f0f9ff; /* Very light blue */
-            border: 1px solid #bfdbfe; /* Light blue border */
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            font-size: 1rem;
-            color: #1e40af; /* Darker blue text */
-            text-align: left;
-            white-space: pre-wrap; /* Preserve whitespace and line breaks */
-            word-wrap: break-word; /* Break long words */
-        }
-        .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #ffffff;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
@@ -122,7 +98,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
                 <label for="age" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Tu edad:</label>
-                <input type="number" id="age" placeholder="Ej: 30" class="focus:ring-indigo-500 focus:border-indigo-500">
+                <input type="number" id="age" placeholder="Ej: 43" class="focus:ring-indigo-500 focus:border-indigo-500">
             </div>
             <div>
                 <label for="childrenUnder18" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Hijos menores de 18:</label>
@@ -130,7 +106,7 @@
             </div>
             <div class="md:col-span-2">
                 <label for="spouseIncome" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Ingresos anuales cónyuge (€):</label>
-                <input type="number" id="spouseIncome" placeholder="Ej: 2100" class="focus:ring-indigo-500 focus:border-indigo-500">
+                <input type="number" id="spouseIncome" placeholder="Ej: 17000" class="focus:ring-indigo-500 focus:border-indigo-500">
             </div>
         </div>
 
@@ -143,7 +119,7 @@
         <div class="section-title">Cálculo como Empleado</div>
         <div class="mb-6">
             <label for="employeeGrossSalary" class="block text-gray-700 text-lg font-semibold mb-2 text-left">Sueldo bruto anual (€) como empleado:</label>
-            <input type="number" id="employeeGrossSalary" placeholder="Ej: 40000" class="focus:ring-indigo-500 focus:border-indigo-500">
+            <input type="number" id="employeeGrossSalary" placeholder="Ej: 30000" class="focus:ring-indigo-500 focus:border-indigo-500">
         </div>
 
         <button onclick="calculateIncome()" class="w-full">Calcular Ingresos</button>
@@ -161,12 +137,6 @@
             <p>IRPF estimado: <span id="employeeIrpfAmountResult" class="font-bold"></span></p>
             <p>Sueldo anual estimado (neto, después de IRPF y SS): <span id="employeeNetAnnualIncomeResult" class="font-bold"></span></p>
             <p>Sueldo mensual estimado (neto, después de IRPF y SS): <span id="employeeNetMonthlyIncomeResult" class="font-bold"></span></p>
-        </div>
-
-        <button onclick="suggestDeductions()" class="w-full mt-6">✨ Sugerencias de Deducciones para Autónomos ✨</button>
-        <div id="deductionsSuggestion" class="llm-response-box hidden">
-            <div id="loadingSpinner" class="hidden loading-spinner mx-auto"></div>
-            <p id="deductionText"></p>
         </div>
 
         <div class="info-text">
@@ -195,7 +165,6 @@
                 <li>Se asume <strong>tributación individual</strong>. Los ingresos del cónyuge se consideran para el contexto familiar, pero no se realiza una simulación de declaración conjunta compleja.</li>
                 <li>Para el cálculo como autónomo, **no se consideran otros gastos deducibles de la actividad** más allá de la cuota de autónomos.</li>
                 <li>Este es un cálculo estimado y <strong>no sustituye el asesoramiento fiscal personalizado</strong>.</li>
-                <li>**Nueva función de IA:** Puedes usar el botón "Sugerencias de Deducciones" para obtener ideas generales sobre gastos deducibles.</li>
             </ul>
         </div>
     </div>
@@ -357,56 +326,6 @@
             resultDiv.classList.remove('hidden');
             resultDiv.classList.remove('bg-red-100', 'border-red-400', 'text-red-700'); // Error styling
             resultDiv.classList.add('bg-blue-100', 'border-blue-400', 'text-blue-700'); // Add success styling
-        }
-
-        /**
-         * Uses the Gemini API to suggest common tax deductions for freelancers in Spain.
-         */
-        async function suggestDeductions() {
-            const deductionsSuggestionDiv = document.getElementById('deductionsSuggestion');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const deductionText = document.getElementById('deductionText');
-
-            deductionsSuggestionDiv.classList.remove('hidden');
-            loadingSpinner.classList.remove('hidden');
-            deductionText.textContent = ''; // Clear previous text
-
-            const prompt = "Genera una lista de 10-15 gastos comunes y deducibles para un autónomo en España para el IRPF, con una breve descripción de cada uno. Formatea la respuesta como una lista numerada.";
-
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-
-            const payload = { contents: chatHistory };
-            const apiKey = ""; // Leave this as-is. Canvas will provide the API key at runtime.
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    deductionText.textContent = text;
-                } else {
-                    deductionText.textContent = "No se pudieron generar sugerencias de deducciones. Inténtalo de nuevo más tarde.";
-                }
-            } catch (error) {
-                console.error("Error al llamar a la API de Gemini:", error);
-                deductionText.textContent = "Error al conectar con el servicio de IA. Por favor, inténtalo de nuevo.";
-            } finally {
-                loadingSpinner.classList.add('hidden');
-            }
         }
     </script>
 </body>
